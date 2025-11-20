@@ -1,6 +1,6 @@
 // Game Constants
 const TILE_SIZE = 48;
-const GRID_SIZE = 50; // Mapa muito maior
+const GRID_SIZE = 100; // Mapa muito maior
 const PLAYER_SIZE = 32;
 const PLAYER_SPEED = 2.5;
 const INVENTORY_SIZE = 32;
@@ -12,8 +12,8 @@ const crops = {
     id: "trigo",
     nome: "Trigo",
     emoji: "🌾",
-    seedCost: 25,
-    sellPrice: 55,
+    seedCost: 150,
+    sellPrice: 200,
     growDays: 3,
     description: "Rápido e consistente",
     color: "#d4af37",
@@ -22,8 +22,8 @@ const crops = {
     id: "milho",
     nome: "Milho",
     emoji: "🌽",
-    seedCost: 45,
-    sellPrice: 95,
+    seedCost: 500,
+    sellPrice: 750,
     growDays: 4,
     description: "Rende um pouco mais",
     color: "#ffd700",
@@ -32,17 +32,148 @@ const crops = {
     id: "uva",
     nome: "Uva",
     emoji: "🍇",
-    seedCost: 65,
-    sellPrice: 140,
+    seedCost: 1200,
+    sellPrice: 1600,
     growDays: 5,
     description: "Demora mas vale ouro",
     color: "#9370db",
   },
+  morango: {
+    id: "morango",
+    nome: "Morango",
+    emoji: "🍓",
+    seedCost: 30000,
+    sellPrice: 35000,
+    growDays: 7,
+    description: "Doce e valioso",
+    color: "#ff1744",
+  },
+  abacaxi: {
+    id: "abacaxi",
+    nome: "Abacaxi",
+    emoji: "🍍",
+    seedCost: 200000,
+    sellPrice: 250000,
+    growDays: 12,
+    description: "Exótico e lucrativo",
+    color: "#ffd700",
+  },
+  melancia: {
+    id: "melancia",
+    nome: "Melancia",
+    emoji: "🍉",
+    seedCost: 1000000,
+    sellPrice: 1250000,
+    growDays: 15,
+    description: "Grande e refrescante",
+    color: "#c41e3a",
+  },
+  ananas: {
+    id: "ananas",
+    nome: "Ananás",
+    emoji: "🥭",
+    seedCost: 10000000,
+    sellPrice: 12500000,
+    growDays: 20,
+    description: "Raro e precioso",
+    color: "#ff8c00",
+  },
+  ouro: {
+    id: "ouro",
+    nome: "Planta de Ouro",
+    emoji: "🥇",
+    seedCost: 50000000,
+    sellPrice: 75000000,
+    growDays: 25,
+    description: "Literalmente vale ouro",
+    color: "#ffd700",
+  },
+  diamante: {
+    id: "diamante",
+    nome: "Planta de Diamante",
+    emoji: "💎",
+    seedCost: 100000000,
+    sellPrice: 150000000,
+    growDays: 30,
+    description: "O mais valioso de todos",
+    color: "#b9f2ff",
+  },
 };
 
-const hoeLabels = ["Básica", "Cobre", "Aço"];
+const hoeLabels = ["Básica", "Cobre", "Aço", "Ouro", "Platina", "Diamante", "Mítica"];
+const harvestLabels = ["Básica", "Cobre", "Aço", "Ouro", "Platina", "Diamante", "Mítica"];
+const fertilizerToolLabels = ["Básico", "Cobre", "Aço", "Ouro", "Platina", "Diamante", "Mítica"];
+const sprinklerLabels = ["Básico", "Cobre", "Aço", "Ouro", "Platina"];
 
-const shopItems = [
+// Format large numbers for display
+function formatNumber(num) {
+  if (num < 1000) {
+    return num.toString();
+  } else if (num < 1000000) {
+    // Thousands
+    const k = num / 1000;
+    return k % 1 === 0 ? `${k}k` : `${k.toFixed(1)}k`;
+  } else if (num < 1000000000) {
+    // Millions
+    const m = num / 1000000;
+    return m % 1 === 0 ? `${m}M` : `${m.toFixed(1)}M`;
+  } else if (num < 1000000000000) {
+    // Billions
+    const b = num / 1000000000;
+    return b % 1 === 0 ? `${b}B` : `${b.toFixed(1)}B`;
+  } else {
+    // Trillions
+    const t = num / 1000000000000;
+    return t % 1 === 0 ? `${t}T` : `${t.toFixed(1)}T`;
+  }
+}
+
+// Fertilizer types
+const fertilizers = {
+  basic: {
+    id: "basic",
+    name: "Fertilizante Básico",
+    reduction: 0.10, // 10% reduction
+    price: 100,
+    emoji: "🌱",
+    desc: "Reduz 10% do tempo de crescimento",
+  },
+  improved: {
+    id: "improved",
+    name: "Fertilizante Melhorado",
+    reduction: 0.20, // 20% reduction
+    price: 500,
+    emoji: "🌿",
+    desc: "Reduz 20% do tempo de crescimento",
+  },
+  quality: {
+    id: "quality",
+    name: "Fertilizante de Qualidade",
+    reduction: 0.30, // 30% reduction
+    price: 2500,
+    emoji: "🍃",
+    desc: "Reduz 30% do tempo de crescimento",
+  },
+  deluxe: {
+    id: "deluxe",
+    name: "Fertilizante Deluxe",
+    reduction: 0.40, // 40% reduction
+    price: 12500,
+    emoji: "🌳",
+    desc: "Reduz 40% do tempo de crescimento",
+  },
+  premium: {
+    id: "premium",
+    name: "Fertilizante Premium",
+    reduction: 0.50, // 50% reduction
+    price: 62500,
+    emoji: "🌲",
+    desc: "Reduz 50% do tempo de crescimento",
+  },
+};
+
+// Shop items separated by category
+const seedsShop = [
   {
     id: "seed_trigo",
     label: "Semente de Trigo",
@@ -71,11 +202,105 @@ const shopItems = [
     emoji: "🍇",
   },
   {
-    id: "sprinkler",
-    label: "Sprinkler",
+    id: "seed_morango",
+    label: "Semente de Morango",
+    type: "seed",
+    crop: "morango",
+    price: crops.morango.seedCost,
+    desc: crops.morango.description,
+    emoji: "🍓",
+  },
+  {
+    id: "seed_abacaxi",
+    label: "Semente de Abacaxi",
+    type: "seed",
+    crop: "abacaxi",
+    price: crops.abacaxi.seedCost,
+    desc: crops.abacaxi.description,
+    emoji: "🍍",
+  },
+  {
+    id: "seed_melancia",
+    label: "Semente de Melancia",
+    type: "seed",
+    crop: "melancia",
+    price: crops.melancia.seedCost,
+    desc: crops.melancia.description,
+    emoji: "🍉",
+  },
+  {
+    id: "seed_ananas",
+    label: "Semente de Ananás",
+    type: "seed",
+    crop: "ananas",
+    price: crops.ananas.seedCost,
+    desc: crops.ananas.description,
+    emoji: "🥭",
+  },
+  {
+    id: "seed_ouro",
+    label: "Semente de Planta de Ouro",
+    type: "seed",
+    crop: "ouro",
+    price: crops.ouro.seedCost,
+    desc: crops.ouro.description,
+    emoji: "🥇",
+  },
+  {
+    id: "seed_diamante",
+    label: "Semente de Planta de Diamante",
+    type: "seed",
+    crop: "diamante",
+    price: crops.diamante.seedCost,
+    desc: crops.diamante.description,
+    emoji: "💎",
+  },
+];
+
+const toolsShop = [
+  {
+    id: "sprinkler_lvl_1",
+    label: "Sprinkler Básico",
     type: "sprinkler",
-    price: 250,
-    desc: "Irriga automaticamente o tile todo dia.",
+    level: 1,
+    price: 1000,
+    desc: "Irriga automaticamente uma área 3x3.",
+    emoji: "💧",
+  },
+  {
+    id: "sprinkler_lvl_2",
+    label: "Sprinkler de Cobre",
+    type: "sprinkler",
+    level: 2,
+    price: 5000,
+    desc: "Irriga automaticamente uma área 5x5.",
+    emoji: "💧",
+  },
+  {
+    id: "sprinkler_lvl_3",
+    label: "Sprinkler de Aço",
+    type: "sprinkler",
+    level: 3,
+    price: 20000,
+    desc: "Irriga automaticamente uma área 7x7.",
+    emoji: "💧",
+  },
+  {
+    id: "sprinkler_lvl_4",
+    label: "Sprinkler de Ouro",
+    type: "sprinkler",
+    level: 4,
+    price: 100000,
+    desc: "Irriga automaticamente uma área 9x9.",
+    emoji: "💧",
+  },
+  {
+    id: "sprinkler_lvl_5",
+    label: "Sprinkler de Platina",
+    type: "sprinkler",
+    level: 5,
+    price: 500000,
+    desc: "Irriga automaticamente uma área 11x11.",
     emoji: "💧",
   },
   {
@@ -83,7 +308,7 @@ const shopItems = [
     label: "Enxada de Cobre",
     type: "hoe",
     level: 2,
-    price: 400,
+    price: 3000,
     desc: "Tilha uma área 2x2.",
     emoji: "🔨",
   },
@@ -92,10 +317,157 @@ const shopItems = [
     label: "Enxada de Aço",
     type: "hoe",
     level: 3,
-    price: 900,
+    price: 10000,
     desc: "Tilha até 3x3 de uma vez.",
     emoji: "🔨",
   },
+  {
+    id: "hoe_lvl_4",
+    label: "Enxada de Ouro",
+    type: "hoe",
+    level: 4,
+    price: 50000,
+    desc: "Tilha até 4x4 de uma vez.",
+    emoji: "🔨",
+  },
+  {
+    id: "hoe_lvl_5",
+    label: "Enxada de Platina",
+    type: "hoe",
+    level: 5,
+    price: 250000,
+    desc: "Tilha até 5x5 de uma vez.",
+    emoji: "🔨",
+  },
+  {
+    id: "hoe_lvl_6",
+    label: "Enxada de Diamante",
+    type: "hoe",
+    level: 6,
+    price: 1000000,
+    desc: "Tilha até 6x6 de uma vez.",
+    emoji: "🔨",
+  },
+  {
+    id: "hoe_lvl_7",
+    label: "Enxada Mítica",
+    type: "hoe",
+    level: 7,
+    price: 5000000,
+    desc: "Tilha até 7x7 de uma vez.",
+    emoji: "🔨",
+  },
+  {
+    id: "harvest_lvl_2",
+    label: "Foice de Cobre",
+    type: "harvest",
+    level: 2,
+    price: 3000,
+    desc: "Colhe uma área 2x2.",
+    emoji: "⚔️",
+  },
+  {
+    id: "harvest_lvl_3",
+    label: "Foice de Aço",
+    type: "harvest",
+    level: 3,
+    price: 10000,
+    desc: "Colhe até 3x3 de uma vez.",
+    emoji: "⚔️",
+  },
+  {
+    id: "harvest_lvl_4",
+    label: "Foice de Ouro",
+    type: "harvest",
+    level: 4,
+    price: 50000,
+    desc: "Colhe até 4x4 de uma vez.",
+    emoji: "⚔️",
+  },
+  {
+    id: "harvest_lvl_5",
+    label: "Foice de Platina",
+    type: "harvest",
+    level: 5,
+    price: 250000,
+    desc: "Colhe até 5x5 de uma vez.",
+    emoji: "⚔️",
+  },
+  {
+    id: "harvest_lvl_6",
+    label: "Foice de Diamante",
+    type: "harvest",
+    level: 6,
+    price: 1000000,
+    desc: "Colhe até 6x6 de uma vez.",
+    emoji: "⚔️",
+  },
+  {
+    id: "harvest_lvl_7",
+    label: "Foice Mítica",
+    type: "harvest",
+    level: 7,
+    price: 5000000,
+    desc: "Colhe até 7x7 de uma vez.",
+    emoji: "⚔️",
+  },
+  {
+    id: "fertilizer_tool_lvl_2",
+    label: "Aplicador de Fertilizante de Cobre",
+    type: "fertilizer_tool",
+    level: 2,
+    price: 5000,
+    desc: "Aplica fertilizante em área 2x2.",
+    emoji: "🌿",
+  },
+  {
+    id: "fertilizer_tool_lvl_3",
+    label: "Aplicador de Fertilizante de Aço",
+    type: "fertilizer_tool",
+    level: 3,
+    price: 20000,
+    desc: "Aplica fertilizante em área 3x3.",
+    emoji: "🌿",
+  },
+  {
+    id: "fertilizer_tool_lvl_4",
+    label: "Aplicador de Fertilizante de Ouro",
+    type: "fertilizer_tool",
+    level: 4,
+    price: 100000,
+    desc: "Aplica fertilizante em área 4x4.",
+    emoji: "🌿",
+  },
+  {
+    id: "fertilizer_tool_lvl_5",
+    label: "Aplicador de Fertilizante de Platina",
+    type: "fertilizer_tool",
+    level: 5,
+    price: 500000,
+    desc: "Aplica fertilizante em área 5x5.",
+    emoji: "🌿",
+  },
+  {
+    id: "fertilizer_tool_lvl_6",
+    label: "Aplicador de Fertilizante de Diamante",
+    type: "fertilizer_tool",
+    level: 6,
+    price: 2000000,
+    desc: "Aplica fertilizante em área 6x6.",
+    emoji: "🌿",
+  },
+  {
+    id: "fertilizer_tool_lvl_7",
+    label: "Aplicador de Fertilizante Mítico",
+    type: "fertilizer_tool",
+    level: 7,
+    price: 10000000,
+    desc: "Aplica fertilizante em área 7x7.",
+    emoji: "🌿",
+  },
+];
+
+const blocksShop = [
   {
     id: "chest",
     label: "Chest",
@@ -106,11 +478,61 @@ const shopItems = [
   },
 ];
 
+const fertilizerShop = [
+  {
+    id: "fertilizer_basic",
+    label: "Fertilizante Básico",
+    type: "fertilizer",
+    fertilizerType: "basic",
+    price: fertilizers.basic.price,
+    desc: fertilizers.basic.desc,
+    emoji: fertilizers.basic.emoji,
+  },
+  {
+    id: "fertilizer_improved",
+    label: "Fertilizante Melhorado",
+    type: "fertilizer",
+    fertilizerType: "improved",
+    price: fertilizers.improved.price,
+    desc: fertilizers.improved.desc,
+    emoji: fertilizers.improved.emoji,
+  },
+  {
+    id: "fertilizer_quality",
+    label: "Fertilizante de Qualidade",
+    type: "fertilizer",
+    fertilizerType: "quality",
+    price: fertilizers.quality.price,
+    desc: fertilizers.quality.desc,
+    emoji: fertilizers.quality.emoji,
+  },
+  {
+    id: "fertilizer_deluxe",
+    label: "Fertilizante Deluxe",
+    type: "fertilizer",
+    fertilizerType: "deluxe",
+    price: fertilizers.deluxe.price,
+    desc: fertilizers.deluxe.desc,
+    emoji: fertilizers.deluxe.emoji,
+  },
+  {
+    id: "fertilizer_premium",
+    label: "Fertilizante Premium",
+    type: "fertilizer",
+    fertilizerType: "premium",
+    price: fertilizers.premium.price,
+    desc: fertilizers.premium.desc,
+    emoji: fertilizers.premium.emoji,
+  },
+];
+
 // Game State
 const state = {
   day: 1,
   money: 350,
   hoeLevel: 1,
+  harvestLevel: 1,
+  fertilizerToolLevel: 1,
   inventory: Array(INVENTORY_SIZE).fill(null),
   hotbarSelection: 0,
   farmland: [],
@@ -130,16 +552,37 @@ const state = {
     {
       x: TILE_SIZE * 15,
       y: TILE_SIZE * 3,
-      type: "shop",
-      name: "Vendedor",
+      type: "seed_shop",
+      name: "Vendedor de Sementes",
+      emoji: "🌱",
+    },
+    {
+      x: TILE_SIZE * 20,
+      y: TILE_SIZE * 3,
+      type: "tool_shop",
+      name: "Ferreiro",
+      emoji: "🔧",
+    },
+    {
+      x: TILE_SIZE * 25,
+      y: TILE_SIZE * 3,
+      type: "block_shop",
+      name: "Carpinteiro",
+      emoji: "🪵",
     },
   ],
   selectedInventorySlot: null,
   draggedItem: null,
   draggedFromSlot: null,
   draggedFromChest: false,
-  openModal: null, // "inventory", "shop", "chest"
+  openModal: null, // "inventory", "shop", "chest", "fertilizer_select", "save_slots"
   openChest: null,
+  currentShopType: null, // "seed_shop", "tool_shop", "block_shop"
+  selectedFertilizerType: null, // Selected fertilizer type for application
+  fertilizerTargetTile: null, // Tile where fertilizer will be applied
+  currentSaveSlot: 1, // Current save slot (1-3)
+  mouseWorldX: -1, // Mouse position in world coordinates (-1 means not on canvas)
+  mouseWorldY: -1, // Mouse position in world coordinates (-1 means not on canvas)
 };
 
 // Canvas Setup
@@ -195,7 +638,8 @@ function initFarm() {
         tilled: false,
         watered: false,
         crop: null,
-        sprinkler: false,
+        sprinkler: 0, // 0 = no sprinkler, 1-5 = sprinkler levels
+        fertilizer: null, // null = no fertilizer, otherwise fertilizer id
         chest: null,
         tree: hasTree,
       });
@@ -205,7 +649,8 @@ function initFarm() {
   // Add initial items to inventory
   addItemToInventory({ type: "hoe", level: 1, emoji: "🔨", name: "Enxada Básica" });
   addItemToInventory({ type: "water", emoji: "💧", name: "Regador" });
-  addItemToInventory({ type: "scythe", emoji: "⚔️", name: "Foice" });
+  addItemToInventory({ type: "harvest", level: 1, emoji: "⚔️", name: "Foice Básica" });
+  addItemToInventory({ type: "fertilizer_tool", level: 1, emoji: "🌿", name: "Aplicador de Fertilizante Básico" });
   addItemToInventory({ type: "axe", emoji: "🪓", name: "Machado" });
   addItemToInventory({ type: "seed", crop: "trigo", emoji: "🌾", name: "Semente de Trigo" }, 3);
 }
@@ -213,11 +658,13 @@ function initFarm() {
 // Inventory System
 function addItemToInventory(item, count = 1) {
   // Try to stack with existing items
-  if (item.type === "seed" || item.type === "sprinkler" || item.type === "chest") {
+  if (item.type === "seed" || item.type === "sprinkler" || item.type === "chest" || item.type === "fertilizer") {
     for (let i = 0; i < state.inventory.length; i++) {
       if (state.inventory[i] && 
           state.inventory[i].type === item.type &&
-          state.inventory[i].crop === item.crop) {
+          (item.type === "seed" ? state.inventory[i].crop === item.crop :
+           item.type === "fertilizer" ? state.inventory[i].fertilizerType === item.fertilizerType :
+           true)) {
         state.inventory[i].count += count;
         return true;
       }
@@ -286,6 +733,40 @@ function getTileInFront() {
   }
 
   return getTileAtWorld(targetX, targetY);
+}
+
+// Check if player is within range of a target tile
+// For area tools, checks if player is within the tool's area of effect
+function isWithinRange(tile, toolLevel = 1) {
+  if (!tile) return false;
+  
+  const playerTileX = Math.floor(state.player.x / TILE_SIZE);
+  const playerTileY = Math.floor(state.player.y / TILE_SIZE);
+  
+  // For single-tile tools (level 1), check if adjacent or same tile
+  if (toolLevel === 1) {
+    const distanceX = Math.abs(playerTileX - tile.col);
+    const distanceY = Math.abs(playerTileY - tile.row);
+    return distanceX <= 1 && distanceY <= 1;
+  }
+  
+  // For area tools, check if the tile is within the tool's area
+  // and if the player is also within that area
+  const radius = toolLevel - 1;
+  const frontTile = getTileInFront();
+  if (!frontTile) return false;
+  
+  const { row: centerRow, col: centerCol } = frontTile;
+  
+  // Check if target tile is within the tool's area
+  const tileInArea = Math.abs(tile.row - centerRow) <= radius && 
+                     Math.abs(tile.col - centerCol) <= radius;
+  
+  // Check if player is within the tool's area
+  const playerInArea = Math.abs(playerTileY - centerRow) <= radius && 
+                       Math.abs(playerTileX - centerCol) <= radius;
+  
+  return tileInArea && playerInArea;
 }
 
 // Player Movement
@@ -389,13 +870,29 @@ function interact() {
   if (state.openModal) return; // Don't interact when modal is open
   
   const npc = isNearNPC();
-  if (npc && npc.type === "shop") {
-    openShop();
+  if (npc && (npc.type === "seed_shop" || npc.type === "tool_shop" || npc.type === "block_shop")) {
+    openShop(npc.type);
     return;
   }
 
   const tile = getTileInFront();
   if (!tile) return;
+
+  // Get tool level for range check
+  let toolLevel = 1;
+  if (item.type === "hoe") {
+    toolLevel = item.level || state.hoeLevel || 1;
+  } else if (item.type === "harvest" || item.type === "scythe") {
+    toolLevel = item.level || state.harvestLevel || 1;
+  } else if (item.type === "fertilizer_tool") {
+    toolLevel = item.level || state.fertilizerToolLevel || 1;
+  }
+
+  // Check if player is within range
+  if (!isWithinRange(tile, toolLevel)) {
+    addLog("Muito longe! Aproxime-se mais.");
+    return;
+  }
 
   // Check for chest interaction
   if (tile.chest) {
@@ -410,7 +907,7 @@ function interact() {
   }
 
   if (item.type === "hoe") {
-    tillArea(tile, item.level || 1);
+    tillArea(tile, item.level || state.hoeLevel || 1);
   } else if (item.type === "water") {
     waterTile(tile);
   } else if (item.type === "seed") {
@@ -420,13 +917,30 @@ function interact() {
   } else if (item.type === "chest") {
     placeChest(tile, item);
   } else if (item.type === "scythe" || item.type === "harvest") {
-    harvestCrop(tile);
+    harvestArea(tile, item.level || state.harvestLevel || 1);
   } else if (item.type === "axe") {
     chopTree(tile);
+  } else if (item.type === "fertilizer_tool") {
+    openFertilizerSelect(tile, item.level || state.fertilizerToolLevel || 1);
   } else {
     addLog(`Item ${item.type} não pode ser usado aqui.`);
   }
 }
+
+// Track mouse position for preview
+canvas.addEventListener("mousemove", (e) => {
+  if (state.openModal) return;
+  
+  const rect = canvas.getBoundingClientRect();
+  state.mouseWorldX = e.clientX - rect.left + state.camera.x;
+  state.mouseWorldY = e.clientY - rect.top + state.camera.y;
+});
+
+// Reset mouse position when leaving canvas (hides preview)
+canvas.addEventListener("mouseleave", () => {
+  state.mouseWorldX = -1;
+  state.mouseWorldY = -1;
+});
 
 // Handle mouse click on canvas
 canvas.addEventListener("click", (e) => {
@@ -439,6 +953,22 @@ canvas.addEventListener("click", (e) => {
   const tile = getTileAtWorld(mouseX, mouseY);
   if (!tile) return;
 
+  // Get tool level for range check
+  let toolLevel = 1;
+  if (item.type === "hoe") {
+    toolLevel = item.level || state.hoeLevel || 1;
+  } else if (item.type === "harvest" || item.type === "scythe") {
+    toolLevel = item.level || state.harvestLevel || 1;
+  } else if (item.type === "fertilizer_tool") {
+    toolLevel = item.level || state.fertilizerToolLevel || 1;
+  }
+
+  // Check if player is within range
+  if (!isWithinRange(tile, toolLevel)) {
+    addLog("Muito longe! Aproxime-se mais.");
+    return;
+  }
+
   // Check for chest interaction
   if (tile.chest) {
     openChest(tile.chest);
@@ -449,7 +979,7 @@ canvas.addEventListener("click", (e) => {
   if (!item) return;
 
   if (item.type === "hoe") {
-    tillArea(tile, item.level || 1);
+    tillArea(tile, item.level || state.hoeLevel || 1);
   } else if (item.type === "water") {
     waterTile(tile);
   } else if (item.type === "seed") {
@@ -459,9 +989,11 @@ canvas.addEventListener("click", (e) => {
   } else if (item.type === "chest") {
     placeChest(tile, item);
   } else if (item.type === "scythe" || item.type === "harvest") {
-    harvestCrop(tile);
+    harvestArea(tile, item.level || state.harvestLevel || 1);
   } else if (item.type === "axe") {
     chopTree(tile);
+  } else if (item.type === "fertilizer_tool") {
+    openFertilizerSelect(tile, item.level || state.fertilizerToolLevel || 1);
   }
   
   renderInventory();
@@ -519,7 +1051,7 @@ function plantSeed(tile, item) {
 }
 
 function placeSprinkler(tile, item) {
-  if (tile.sprinkler) {
+  if (tile.sprinkler > 0) {
     addLog("Já existe um sprinkler aqui.");
     return;
   }
@@ -534,9 +1066,10 @@ function placeSprinkler(tile, item) {
     return;
   }
   
+  const level = item.level || 1;
   removeItemFromInventory(slotIndex, 1);
-  tile.sprinkler = true;
-  addLog("Sprinkler colocado! Esta área será irrigada automaticamente.");
+  tile.sprinkler = level;
+  addLog(`Sprinkler nível ${level} colocado! Esta área será irrigada automaticamente.`);
 }
 
 function placeChest(tile, item) {
@@ -544,7 +1077,7 @@ function placeChest(tile, item) {
     addLog("Já existe um chest aqui.");
     return;
   }
-  if (tile.crop || tile.sprinkler || tile.tilled) {
+  if (tile.crop || tile.sprinkler > 0 || tile.tilled) {
     addLog("Não pode colocar aqui.");
     return;
   }
@@ -574,23 +1107,50 @@ function waterTile(tile) {
   addLog("Regou o solo.");
 }
 
-function harvestCrop(tile) {
+function harvestCrop(tile, level = null) {
   if (!tile.crop) {
-    addLog("Não há nada para colher aqui.");
-    return;
+    return false;
   }
   if (!tile.crop.ready) {
-    addLog("A plantação ainda não está pronta para colher.");
-    return;
+    return false;
   }
   const cropData = crops[tile.crop.type];
-  const qualityBonus = 1 + (state.hoeLevel - 1) * 0.15;
+  const harvestLevel = level || state.harvestLevel;
+  const qualityBonus = 1 + (harvestLevel - 1) * 0.15;
   const payout = Math.round(cropData.sellPrice * qualityBonus);
   state.money += payout;
   tile.crop = null;
+  tile.fertilizer = null; // Remove fertilizer when crop is harvested
   tile.tilled = false; // Transform into soil tile instead of keeping it hoed
   tile.watered = false;
-  addLog(`Colheu ${cropData.nome} e recebeu ${payout}g!`);
+  return true;
+}
+
+function harvestArea(tile, level) {
+  const radius = level - 1;
+  const { row, col } = tile;
+  let harvested = 0;
+  const moneyBefore = state.money;
+
+  for (let r = row - radius; r <= row + radius; r++) {
+    for (let c = col - radius; c <= col + radius; c++) {
+      const t = getTileAt(r, c);
+      if (t && isWithinRange(t, level)) {
+        if (harvestCrop(t, level)) {
+          harvested++;
+        }
+      }
+    }
+  }
+
+  const totalPayout = state.money - moneyBefore;
+
+  if (harvested > 0) {
+    addLog(`Colheu ${harvested} plantação(ões) e recebeu ${formatNumber(totalPayout)} gold!`);
+    renderStats();
+  } else {
+    addLog("Não há nada para colher aqui.");
+  }
 }
 
 function chopTree(tile) {
@@ -676,7 +1236,15 @@ function render() {
     // Draw crop
     if (tile.crop) {
       const crop = crops[tile.crop.type];
-      const progress = tile.crop.daysWatered / crop.growDays;
+      // Calculate effective grow days considering fertilizer
+      let effectiveGrowDays = crop.growDays;
+      if (tile.fertilizer) {
+        const fertilizer = fertilizers[tile.fertilizer];
+        if (fertilizer) {
+          effectiveGrowDays = Math.ceil(effectiveGrowDays * (1 - fertilizer.reduction));
+        }
+      }
+      const progress = tile.crop.daysWatered / effectiveGrowDays;
       
       if (tile.crop.ready) {
         ctx.fillStyle = crop.color;
@@ -699,14 +1267,39 @@ function render() {
     }
 
     // Draw sprinkler
-    if (tile.sprinkler) {
-      ctx.fillStyle = "#38bdf8";
+    if (tile.sprinkler > 0) {
+      // Different colors for different levels
+      const colors = {
+        1: { fill: "#38bdf8", stroke: "#0ea5e9" },
+        2: { fill: "#f59e0b", stroke: "#d97706" },
+        3: { fill: "#6366f1", stroke: "#4f46e5" },
+        4: { fill: "#fbbf24", stroke: "#f59e0b" },
+        5: { fill: "#e5e7eb", stroke: "#9ca3af" },
+      };
+      const color = colors[tile.sprinkler] || colors[1];
+      ctx.fillStyle = color.fill;
       ctx.beginPath();
       ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, 8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "#0ea5e9";
+      ctx.strokeStyle = color.stroke;
       ctx.lineWidth = 2;
       ctx.stroke();
+    }
+
+    // Draw fertilizer indicator
+    if (tile.fertilizer && tile.tilled) {
+      const fertilizer = fertilizers[tile.fertilizer];
+      if (fertilizer) {
+        // Small green indicator in corner
+        ctx.fillStyle = fertilizer.emoji === "🌱" ? "#22c55e" : 
+                       fertilizer.emoji === "🌿" ? "#16a34a" :
+                       fertilizer.emoji === "🍃" ? "#15803d" :
+                       fertilizer.emoji === "🌳" ? "#166534" : "#14532d";
+        ctx.fillRect(x + TILE_SIZE - 14, y + 2, 12, 12);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + TILE_SIZE - 14, y + 2, 12, 12);
+      }
     }
 
     // Draw chest
@@ -728,16 +1321,32 @@ function render() {
   state.npcs.forEach((npc) => {
     const npcX = npc.x;
     const npcY = npc.y;
-    ctx.fillStyle = "#8b4513";
+    
+    // Different colors for different shop types
+    let npcColor = "#8b4513";
+    let borderColor = "#654321";
+    
+    if (npc.type === "seed_shop") {
+      npcColor = "#90EE90"; // Light green
+      borderColor = "#228B22"; // Forest green
+    } else if (npc.type === "tool_shop") {
+      npcColor = "#CD853F"; // Peru (brown/orange)
+      borderColor = "#8B4513"; // Saddle brown
+    } else if (npc.type === "block_shop") {
+      npcColor = "#DEB887"; // Burlywood
+      borderColor = "#A0522D"; // Sienna
+    }
+    
+    ctx.fillStyle = npcColor;
     ctx.fillRect(npcX, npcY, PLAYER_SIZE, PLAYER_SIZE);
-    ctx.strokeStyle = "#654321";
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 2;
     ctx.strokeRect(npcX, npcY, PLAYER_SIZE, PLAYER_SIZE);
     ctx.fillStyle = "#fff";
     ctx.font = "20px Arial";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("👤", npcX + PLAYER_SIZE / 2, npcY + PLAYER_SIZE / 2);
+    ctx.fillText(npc.emoji || "👤", npcX + PLAYER_SIZE / 2, npcY + PLAYER_SIZE / 2);
   });
 
   // Draw player
@@ -748,7 +1357,7 @@ function render() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
   ctx.fillRect(playerX + 2, playerY + PLAYER_SIZE - 4, PLAYER_SIZE, 4);
   
-  // Player body
+  // Player body with direction-based appearance
   ctx.fillStyle = "#4a90e2";
   ctx.fillRect(playerX, playerY, PLAYER_SIZE, PLAYER_SIZE);
   
@@ -757,66 +1366,219 @@ function render() {
   ctx.lineWidth = 3;
   ctx.strokeRect(playerX, playerY, PLAYER_SIZE, PLAYER_SIZE);
   
-  // Inner border
-  ctx.strokeStyle = "#1e3a5f";
-  ctx.lineWidth = 1;
-  ctx.strokeRect(playerX + 2, playerY + 2, PLAYER_SIZE - 4, PLAYER_SIZE - 4);
-  
-  // Player direction indicator
+  // Draw player direction indicator (arrow/triangle pointing in facing direction)
   ctx.fillStyle = "#ffeb3b";
-  const indicatorSize = 10;
+  ctx.beginPath();
+  const centerX = playerX + PLAYER_SIZE / 2;
+  const centerY = playerY + PLAYER_SIZE / 2;
+  const arrowSize = 8;
+  
   switch (state.player.facing) {
     case "up":
-      ctx.fillRect(
-        playerX + PLAYER_SIZE / 2 - indicatorSize / 2,
-        playerY + 4,
-        indicatorSize,
-        indicatorSize
-      );
+      ctx.moveTo(centerX, playerY + 6);
+      ctx.lineTo(centerX - arrowSize, playerY + 6 + arrowSize);
+      ctx.lineTo(centerX + arrowSize, playerY + 6 + arrowSize);
       break;
     case "down":
-      ctx.fillRect(
-        playerX + PLAYER_SIZE / 2 - indicatorSize / 2,
-        playerY + PLAYER_SIZE - indicatorSize - 4,
-        indicatorSize,
-        indicatorSize
-      );
+      ctx.moveTo(centerX, playerY + PLAYER_SIZE - 6);
+      ctx.lineTo(centerX - arrowSize, playerY + PLAYER_SIZE - 6 - arrowSize);
+      ctx.lineTo(centerX + arrowSize, playerY + PLAYER_SIZE - 6 - arrowSize);
       break;
     case "left":
-      ctx.fillRect(
-        playerX + 4,
-        playerY + PLAYER_SIZE / 2 - indicatorSize / 2,
-        indicatorSize,
-        indicatorSize
-      );
+      ctx.moveTo(playerX + 6, centerY);
+      ctx.lineTo(playerX + 6 + arrowSize, centerY - arrowSize);
+      ctx.lineTo(playerX + 6 + arrowSize, centerY + arrowSize);
       break;
     case "right":
-      ctx.fillRect(
-        playerX + PLAYER_SIZE - indicatorSize - 4,
-        playerY + PLAYER_SIZE / 2 - indicatorSize / 2,
-        indicatorSize,
-        indicatorSize
-      );
+      ctx.moveTo(playerX + PLAYER_SIZE - 6, centerY);
+      ctx.lineTo(playerX + PLAYER_SIZE - 6 - arrowSize, centerY - arrowSize);
+      ctx.lineTo(playerX + PLAYER_SIZE - 6 - arrowSize, centerY + arrowSize);
       break;
   }
-
-  // Draw interaction hint
-  const frontTile = getTileInFront();
-  if (frontTile && !state.openModal) {
-    const tileX = frontTile.col * TILE_SIZE;
-    const tileY = frontTile.row * TILE_SIZE;
-    ctx.strokeStyle = "rgba(255, 255, 0, 0.6)";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Draw tool preview area (follows mouse)
+  if (!state.openModal) {
+    const selectedItem = getSelectedItem();
+    if (selectedItem) {
+      let previewLevel = 1;
+      let previewType = null;
+      
+      if (selectedItem.type === "hoe") {
+        previewLevel = selectedItem.level || state.hoeLevel || 1;
+        previewType = "hoe";
+      } else if (selectedItem.type === "harvest" || selectedItem.type === "scythe") {
+        previewLevel = selectedItem.level || state.harvestLevel || 1;
+        previewType = "harvest";
+      } else if (selectedItem.type === "fertilizer_tool") {
+        previewLevel = selectedItem.level || state.fertilizerToolLevel || 1;
+        previewType = "fertilizer";
+      } else if (selectedItem.type === "seed") {
+        previewType = "seed";
+      } else if (selectedItem.type === "water") {
+        previewType = "water";
+      }
+      
+      if (previewType && state.mouseWorldX >= 0 && state.mouseWorldY >= 0) {
+        // Get tile under mouse cursor
+        const mouseTile = getTileAtWorld(state.mouseWorldX, state.mouseWorldY);
+        if (mouseTile) {
+          // Check if mouse tile is within range
+          const isInRange = isWithinRange(mouseTile, previewLevel);
+          
+          if (isInRange) {
+            const radius = previewLevel - 1;
+            const { row, col } = mouseTile;
+            
+            // Draw preview area centered on mouse tile
+            for (let r = row - radius; r <= row + radius; r++) {
+              for (let c = col - radius; c <= col + radius; c++) {
+                const t = getTileAt(r, c);
+                if (t) {
+                  // Check if this tile is within range
+                  const tileInRange = isWithinRange(t, previewLevel);
+                  if (tileInRange) {
+                    const tileX = c * TILE_SIZE;
+                    const tileY = r * TILE_SIZE;
+                    
+                    let previewColor = "rgba(255, 255, 0, 0.3)";
+                    if (previewType === "seed") {
+                      previewColor = "rgba(34, 197, 94, 0.3)"; // Green for planting
+                    } else if (previewType === "harvest") {
+                      previewColor = "rgba(251, 191, 36, 0.3)"; // Orange/yellow for harvest
+                    } else if (previewType === "fertilizer") {
+                      previewColor = "rgba(34, 197, 94, 0.3)"; // Green for fertilizer
+                    } else if (previewType === "water") {
+                      previewColor = "rgba(59, 130, 246, 0.3)"; // Blue for water
+                    }
+                    
+                    ctx.fillStyle = previewColor;
+                    ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                    ctx.strokeStyle = previewColor.replace("0.3", "0.8");
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   ctx.restore();
 }
 
 // UI Rendering
+// Tooltip functions
+function getItemDescription(item) {
+  if (!item) return "";
+  
+  let desc = "";
+  const name = item.name || "Item Desconhecido";
+  
+  switch (item.type) {
+    case "hoe":
+      const hoeLevel = item.level || state.hoeLevel || 1;
+      const hoeArea = hoeLevel === 1 ? "1x1" : `${hoeLevel}x${hoeLevel}`;
+      desc = `Enxada nível ${hoeLevel} (${hoeLabels[hoeLevel - 1] || "???"})\nTilha uma área ${hoeArea}.`;
+      break;
+    case "harvest":
+      const harvestLevel = item.level || state.harvestLevel || 1;
+      const harvestArea = harvestLevel === 1 ? "1x1" : `${harvestLevel}x${harvestLevel}`;
+      desc = `Foice nível ${harvestLevel} (${harvestLabels[harvestLevel - 1] || "???"})\nColhe uma área ${harvestArea}.`;
+      break;
+    case "fertilizer_tool":
+      const fertLevel = item.level || state.fertilizerToolLevel || 1;
+      const fertArea = fertLevel === 1 ? "1x1" : `${fertLevel}x${fertLevel}`;
+      desc = `Aplicador de Fertilizante nível ${fertLevel} (${fertilizerToolLabels[fertLevel - 1] || "???"})\nAplica fertilizante em área ${fertArea}.`;
+      break;
+    case "water":
+      desc = "Regador\nRega o solo preparado.";
+      break;
+    case "axe":
+      desc = "Machado\nCorta árvores.";
+      break;
+    case "seed":
+      if (item.crop && crops[item.crop]) {
+        const crop = crops[item.crop];
+        desc = `${crop.nome}\n${crop.description}\nCresce em ${crop.growDays} dias.\nVende por ${formatNumber(crop.sellPrice)} gold.`;
+      } else {
+        desc = "Semente\nPlanta no solo preparado.";
+      }
+      break;
+    case "sprinkler":
+      const sprinklerLevel = item.level || 1;
+      const sprinklerRadius = sprinklerLevel;
+      const sprinklerSize = (sprinklerRadius * 2 + 1);
+      desc = `Sprinkler nível ${sprinklerLevel} (${sprinklerLabels[sprinklerLevel - 1] || "???"})\nIrriga automaticamente uma área ${sprinklerSize}x${sprinklerSize}.`;
+      break;
+    case "chest":
+      desc = "Chest\nArmazena até 16 itens.\nColoque no chão para usar.";
+      break;
+    case "fertilizer":
+      if (item.fertilizerType && fertilizers[item.fertilizerType]) {
+        const fertilizer = fertilizers[item.fertilizerType];
+        desc = `${fertilizer.name}\n${fertilizer.desc}`;
+      } else {
+        desc = "Fertilizante\nReduz o tempo de crescimento das plantas.";
+      }
+      break;
+    default:
+      desc = name;
+  }
+  
+  if (item.count > 1) {
+    desc += `\nQuantidade: ${item.count}`;
+  }
+  
+  return { name, desc };
+}
+
+function showTooltip(event, item) {
+  if (!item) return;
+  
+  const tooltip = document.getElementById("item-tooltip");
+  const tooltipName = document.getElementById("tooltip-name");
+  const tooltipDesc = document.getElementById("tooltip-desc");
+  
+  const { name, desc } = getItemDescription(item);
+  
+  tooltipName.textContent = name;
+  tooltipDesc.textContent = desc;
+  tooltip.style.display = "block";
+  
+  updateTooltipPosition(event);
+}
+
+function hideTooltip() {
+  const tooltip = document.getElementById("item-tooltip");
+  tooltip.style.display = "none";
+}
+
+function updateTooltipPosition(event) {
+  const tooltip = document.getElementById("item-tooltip");
+  const x = event.clientX + 10;
+  const y = event.clientY + 10;
+  
+  tooltip.style.left = `${x}px`;
+  tooltip.style.top = `${y}px`;
+  
+  // Adjust if tooltip goes off screen
+  const rect = tooltip.getBoundingClientRect();
+  if (rect.right > window.innerWidth) {
+    tooltip.style.left = `${event.clientX - rect.width - 10}px`;
+  }
+  if (rect.bottom > window.innerHeight) {
+    tooltip.style.top = `${event.clientY - rect.height - 10}px`;
+  }
+}
+
 function renderStats() {
   document.getElementById("stat-day").textContent = `Dia ${state.day}`;
-  document.getElementById("stat-money").textContent = `Dinheiro: ${state.money}g`;
+  document.getElementById("stat-money").textContent = `Dinheiro: ${formatNumber(state.money)} gold`;
   document.getElementById(
     "stat-hoe"
   ).textContent = `Enxada: ${hoeLabels[state.hoeLevel - 1] ?? "???"}`;
@@ -862,6 +1624,19 @@ function renderHotbar() {
       renderHotbar();
     };
     
+    // Tooltip handlers
+    if (state.inventory[i]) {
+      slot.addEventListener("mouseenter", (e) => {
+        showTooltip(e, state.inventory[i]);
+      });
+      slot.addEventListener("mousemove", (e) => {
+        updateTooltipPosition(e);
+      });
+      slot.addEventListener("mouseleave", () => {
+        hideTooltip();
+      });
+    }
+    
     hotbar.appendChild(slot);
   }
 }
@@ -900,14 +1675,23 @@ function renderInventory() {
       }
     });
     
-    slot.addEventListener("mouseenter", () => {
+    slot.addEventListener("mouseenter", (e) => {
       if (state.draggedItem && state.draggedFromSlot !== i) {
         slot.classList.add("drop-target");
+      } else if (state.inventory[i] && !state.draggedItem) {
+        showTooltip(e, state.inventory[i]);
+      }
+    });
+    
+    slot.addEventListener("mousemove", (e) => {
+      if (state.inventory[i] && !state.draggedItem) {
+        updateTooltipPosition(e);
       }
     });
     
     slot.addEventListener("mouseleave", () => {
       slot.classList.remove("drop-target");
+      hideTooltip();
     });
     
     slot.addEventListener("mouseup", () => {
@@ -970,14 +1754,16 @@ function closeInventory() {
   document.getElementById("inventory-modal").style.display = "none";
 }
 
-function openShop() {
+function openShop(shopType) {
   state.openModal = "shop";
+  state.currentShopType = shopType;
   document.getElementById("shop-modal").style.display = "flex";
   renderShop();
 }
 
 function closeShop() {
   state.openModal = null;
+  state.currentShopType = null;
   document.getElementById("shop-modal").style.display = "none";
 }
 
@@ -1002,13 +1788,34 @@ function closeChest() {
 
 function renderShop() {
   const shop = document.getElementById("shop-items");
+  const shopTitle = document.querySelector("#shop-modal h2");
   shop.innerHTML = "";
-  shopItems.forEach((item) => {
+  
+  // Get the correct shop items based on type
+  let items = [];
+  let title = "Loja";
+  
+  if (state.currentShopType === "seed_shop") {
+    items = [...seedsShop, ...fertilizerShop];
+    title = "Loja de Sementes";
+  } else if (state.currentShopType === "tool_shop") {
+    items = toolsShop;
+    title = "Ferreiro";
+  } else if (state.currentShopType === "block_shop") {
+    items = blocksShop;
+    title = "Carpinteiro";
+  }
+  
+  if (shopTitle) {
+    shopTitle.textContent = title;
+  }
+  
+  items.forEach((item) => {
     const card = document.createElement("div");
     card.className = "shop-card";
     card.innerHTML = `
       <div class="shop-card-info">
-        <strong>${item.emoji} ${item.label} - ${item.price}g</strong>
+        <strong>${item.emoji} ${item.label} - ${formatNumber(item.price)} gold</strong>
         <small>${item.desc}</small>
       </div>
     `;
@@ -1017,6 +1824,26 @@ function renderShop() {
     btn.disabled = !canPurchase(item);
     btn.onclick = () => purchase(item);
     card.appendChild(btn);
+    
+    // Tooltip for shop items
+    card.addEventListener("mouseenter", (e) => {
+      const shopItem = {
+        name: item.label,
+        type: item.type,
+        level: item.level,
+        crop: item.crop,
+        fertilizerType: item.fertilizerType,
+        emoji: item.emoji,
+      };
+      showTooltip(e, shopItem);
+    });
+    card.addEventListener("mousemove", (e) => {
+      updateTooltipPosition(e);
+    });
+    card.addEventListener("mouseleave", () => {
+      hideTooltip();
+    });
+    
     shop.appendChild(card);
   });
 }
@@ -1060,14 +1887,23 @@ function renderChest() {
         }
       });
       
-      slot.addEventListener("mouseenter", () => {
+      slot.addEventListener("mouseenter", (e) => {
         if (state.draggedItem && (state.draggedFromChest || state.draggedFromSlot !== i)) {
           slot.classList.add("drop-target");
+        } else if (state.inventory[i] && !state.draggedItem) {
+          showTooltip(e, state.inventory[i]);
+        }
+      });
+      
+      slot.addEventListener("mousemove", (e) => {
+        if (state.inventory[i] && !state.draggedItem) {
+          updateTooltipPosition(e);
         }
       });
       
       slot.addEventListener("mouseleave", () => {
         slot.classList.remove("drop-target");
+        hideTooltip();
       });
       
       slot.addEventListener("mouseup", () => {
@@ -1126,14 +1962,23 @@ function renderChest() {
     }
     
     // Drag and drop from inventory to chest
-    slot.addEventListener("mouseenter", () => {
+    slot.addEventListener("mouseenter", (e) => {
       if (state.draggedItem && state.draggedFromSlot !== null) {
         slot.classList.add("drop-target");
+      } else if (state.openChest.items[i] && !state.draggedItem) {
+        showTooltip(e, state.openChest.items[i]);
+      }
+    });
+    
+    slot.addEventListener("mousemove", (e) => {
+      if (state.openChest.items[i] && !state.draggedItem) {
+        updateTooltipPosition(e);
       }
     });
     
     slot.addEventListener("mouseleave", () => {
       slot.classList.remove("drop-target");
+      hideTooltip();
     });
     
     slot.addEventListener("mouseup", () => {
@@ -1181,6 +2026,8 @@ function renderChest() {
 function canPurchase(item) {
   if (state.money < item.price) return false;
   if (item.type === "hoe" && state.hoeLevel >= item.level) return false;
+  if (item.type === "harvest" && state.harvestLevel >= item.level) return false;
+  if (item.type === "fertilizer_tool" && state.fertilizerToolLevel >= item.level) return false;
   return true;
 }
 
@@ -1205,6 +2052,7 @@ function purchase(item) {
   } else if (item.type === "sprinkler") {
     const newItem = {
       type: "sprinkler",
+      level: item.level || 1,
       emoji: item.emoji,
       name: item.label,
       count: 1,
@@ -1214,7 +2062,7 @@ function purchase(item) {
       state.money += item.price;
       return;
     }
-    addLog("Comprou um sprinkler!");
+    addLog(`Comprou ${item.label}!`);
   } else if (item.type === "chest") {
     const newItem = {
       type: "chest",
@@ -1239,6 +2087,44 @@ function purchase(item) {
       }
     }
     addLog(`Enxada melhorada para nível ${item.level}!`);
+  } else if (item.type === "harvest") {
+    state.harvestLevel = item.level;
+    // Update harvest tool in inventory
+    for (let i = 0; i < state.inventory.length; i++) {
+      if (state.inventory[i] && (state.inventory[i].type === "harvest" || state.inventory[i].type === "scythe")) {
+        state.inventory[i].type = "harvest";
+        state.inventory[i].level = item.level;
+        state.inventory[i].name = item.label;
+        break;
+      }
+    }
+    addLog(`Foice melhorada para nível ${item.level}!`);
+  } else if (item.type === "fertilizer_tool") {
+    state.fertilizerToolLevel = item.level;
+    // Update fertilizer tool in inventory
+    for (let i = 0; i < state.inventory.length; i++) {
+      if (state.inventory[i] && state.inventory[i].type === "fertilizer_tool") {
+        state.inventory[i].level = item.level;
+        state.inventory[i].name = item.label;
+        state.inventory[i].emoji = item.emoji;
+        break;
+      }
+    }
+    addLog(`Aplicador de Fertilizante melhorado para nível ${item.level}!`);
+  } else if (item.type === "fertilizer") {
+    const newItem = {
+      type: "fertilizer",
+      fertilizerType: item.fertilizerType,
+      emoji: item.emoji,
+      name: item.label,
+      count: 1,
+    };
+    if (!addItemToInventory(newItem, 1)) {
+      addLog("Inventário cheio!");
+      state.money += item.price;
+      return;
+    }
+    addLog(`Comprou ${item.label}!`);
   }
   
   renderInventory();
@@ -1266,11 +2152,13 @@ function renderLog() {
 // Day Progression
 function applySprinklers() {
   state.farmland.forEach((tile) => {
-    if (tile.sprinkler) {
-      // Water 3x3 area around sprinkler
+    if (tile.sprinkler > 0) {
+      // Water area around sprinkler based on level
+      // Level 1: 3x3, Level 2: 5x5, Level 3: 7x7, Level 4: 9x9, Level 5: 11x11
+      const radius = tile.sprinkler; // 1 = 1 tile radius (3x3), 2 = 2 tile radius (5x5), etc.
       const { row, col } = tile;
-      for (let r = row - 1; r <= row + 1; r++) {
-        for (let c = col - 1; c <= col + 1; c++) {
+      for (let r = row - radius; r <= row + radius; r++) {
+        for (let c = col - radius; c <= col + radius; c++) {
           const t = getTileAt(r, c);
           if (t && t.tilled) {
             t.watered = true;
@@ -1287,15 +2175,23 @@ function progressDay() {
   applySprinklers();
   state.farmland.forEach((tile) => {
     if (!tile.crop) {
-      tile.watered = tile.sprinkler;
+      tile.watered = tile.sprinkler > 0;
       return;
     }
     if (tile.watered) {
       tile.crop.daysWatered += 1;
-      if (tile.crop.daysWatered >= crops[tile.crop.type].growDays) {
+      // Calculate effective grow days considering fertilizer
+      let effectiveGrowDays = crops[tile.crop.type].growDays;
+      if (tile.fertilizer) {
+        const fertilizer = fertilizers[tile.fertilizer];
+        if (fertilizer) {
+          effectiveGrowDays = Math.ceil(effectiveGrowDays * (1 - fertilizer.reduction));
+        }
+      }
+      if (tile.crop.daysWatered >= effectiveGrowDays) {
         tile.crop.ready = true;
       }
-      tile.watered = tile.sprinkler;
+      tile.watered = tile.sprinkler > 0;
     } else {
       addLog(`${crops[tile.crop.type].nome} não cresceu por falta de água.`);
     }
@@ -1323,6 +2219,8 @@ document.addEventListener("keydown", (e) => {
       if (state.openModal === "inventory") closeInventory();
       else if (state.openModal === "shop") closeShop();
       else if (state.openModal === "chest") closeChest();
+      else if (state.openModal === "fertilizer_select") closeFertilizerSelect();
+      else if (state.openModal === "save_slots") closeSaveSlotsModal();
       return;
     }
     // If modal is open, only process hotbar and close keys
@@ -1368,6 +2266,12 @@ document.addEventListener("keyup", (e) => {
 document.getElementById("close-inventory").onclick = closeInventory;
 document.getElementById("close-shop").onclick = closeShop;
 document.getElementById("close-chest").onclick = closeChest;
+document.getElementById("close-fertilizer").onclick = closeFertilizerSelect;
+document.getElementById("close-save-slots").onclick = closeSaveSlotsModal;
+
+// Save/Load button handlers
+document.getElementById("save-btn").onclick = () => openSaveSlotsModal("save");
+document.getElementById("load-btn").onclick = () => openSaveSlotsModal("load");
 
 // Game Loop
 function gameLoop() {
@@ -1378,6 +2282,436 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
+// Fertilizer Functions
+function applyFertilizer(tile, fertilizerType) {
+  if (!tile.tilled) {
+    return false;
+  }
+  // Only allow fertilizer if there's no crop, or if crop doesn't have fertilizer yet
+  if (tile.crop && tile.fertilizer) {
+    return false;
+  }
+  if (!tile.crop && tile.fertilizer) {
+    return false;
+  }
+  
+  // Check if player has the fertilizer in inventory
+  const fertilizer = fertilizers[fertilizerType];
+  if (!fertilizer) {
+    return false;
+  }
+  
+  // Find fertilizer in inventory
+  let foundFertilizer = false;
+  for (let i = 0; i < state.inventory.length; i++) {
+    if (state.inventory[i] && 
+        state.inventory[i].type === "fertilizer" && 
+        state.inventory[i].fertilizerType === fertilizerType) {
+      removeItemFromInventory(i, 1);
+      foundFertilizer = true;
+      break;
+    }
+  }
+  
+  if (!foundFertilizer) {
+    return false;
+  }
+  
+  tile.fertilizer = fertilizerType;
+  return true;
+}
+
+function applyFertilizerArea(tile, fertilizerType, level) {
+  const radius = level - 1;
+  const { row, col } = tile;
+  let applied = 0;
+  
+  // Check if player has enough fertilizer
+  const fertilizer = fertilizers[fertilizerType];
+  if (!fertilizer) {
+    addLog("Tipo de fertilizante inválido.");
+    return;
+  }
+  
+  // Count how many tiles need fertilizer (must be within range of player)
+  let tilesNeedingFertilizer = 0;
+  for (let r = row - radius; r <= row + radius; r++) {
+    for (let c = col - radius; c <= col + radius; c++) {
+      const t = getTileAt(r, c);
+      if (t && isWithinRange(t, level) && t.tilled && !t.fertilizer) {
+        tilesNeedingFertilizer++;
+      }
+    }
+  }
+  
+  if (tilesNeedingFertilizer === 0) {
+    addLog("Nenhum tile válido para aplicar fertilizante nesta área.");
+    return;
+  }
+  
+  // Check if player has enough fertilizer
+  let fertilizerCount = 0;
+  for (let i = 0; i < state.inventory.length; i++) {
+    if (state.inventory[i] && 
+        state.inventory[i].type === "fertilizer" && 
+        state.inventory[i].fertilizerType === fertilizerType) {
+      fertilizerCount += state.inventory[i].count || 1;
+    }
+  }
+  
+  if (fertilizerCount < tilesNeedingFertilizer) {
+    addLog(`Você não possui fertilizante suficiente! Precisa de ${tilesNeedingFertilizer}, tem ${fertilizerCount}.`);
+    return;
+  }
+  
+  // Apply fertilizer to all tiles in area (that are within range)
+  for (let r = row - radius; r <= row + radius; r++) {
+    for (let c = col - radius; c <= col + radius; c++) {
+      const t = getTileAt(r, c);
+      if (t && isWithinRange(t, level)) {
+        if (applyFertilizer(t, fertilizerType)) {
+          applied++;
+        }
+      }
+    }
+  }
+  
+  if (applied > 0) {
+    addLog(`${fertilizer.name} aplicado em ${applied} tile(s)! Reduz ${(fertilizer.reduction * 100).toFixed(0)}% do tempo de crescimento.`);
+  } else {
+    addLog("Nenhum tile válido para aplicar fertilizante.");
+  }
+}
+
+function openFertilizerSelect(tile, level) {
+  state.openModal = "fertilizer_select";
+  state.fertilizerTargetTile = tile;
+  state.fertilizerToolLevel = level;
+  document.getElementById("fertilizer-modal").style.display = "flex";
+  renderFertilizerSelect();
+}
+
+function closeFertilizerSelect() {
+  state.openModal = null;
+  state.fertilizerTargetTile = null;
+  document.getElementById("fertilizer-modal").style.display = "none";
+}
+
+function renderFertilizerSelect() {
+  const container = document.getElementById("fertilizer-items");
+  container.innerHTML = "";
+  
+  const level = state.fertilizerToolLevel || 1;
+  const areaSize = level === 1 ? "1x1" : `${level}x${level}`;
+  
+  Object.values(fertilizers).forEach((fertilizer) => {
+    // Check if player has this fertilizer in inventory
+    const hasFertilizer = state.inventory.some(item => 
+      item && item.type === "fertilizer" && item.fertilizerType === fertilizer.id
+    );
+    
+    const card = document.createElement("div");
+    card.className = "shop-card";
+    card.innerHTML = `
+      <div class="shop-card-info">
+        <strong>${fertilizer.emoji} ${fertilizer.name}</strong>
+        <small>${fertilizer.desc}</small>
+        <small>Área: ${areaSize}</small>
+        ${!hasFertilizer ? '<small style="color: #ef4444;">Você não possui este fertilizante</small>' : ''}
+      </div>
+    `;
+    const btn = document.createElement("button");
+    btn.textContent = hasFertilizer ? "Aplicar" : "Sem estoque";
+    btn.disabled = !hasFertilizer;
+    btn.onclick = () => {
+      if (hasFertilizer && state.fertilizerTargetTile) {
+        applyFertilizerArea(state.fertilizerTargetTile, fertilizer.id, level);
+        closeFertilizerSelect();
+        renderInventory();
+      }
+    };
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
+}
+
+// Save/Load System using localStorage with slots
+function saveGame(slot = null) {
+  const saveSlot = slot || state.currentSaveSlot;
+  try {
+    const saveData = {
+      day: state.day,
+      money: state.money,
+      hoeLevel: state.hoeLevel,
+      harvestLevel: state.harvestLevel,
+      fertilizerToolLevel: state.fertilizerToolLevel,
+      inventory: state.inventory,
+      hotbarSelection: state.hotbarSelection,
+      farmland: state.farmland.map(tile => ({
+        row: tile.row,
+        col: tile.col,
+        tilled: tile.tilled,
+        watered: tile.watered,
+        crop: tile.crop,
+        sprinkler: tile.sprinkler,
+        fertilizer: tile.fertilizer,
+        chest: tile.chest ? {
+          id: tile.chest.id,
+          items: tile.chest.items
+        } : null,
+        tree: tile.tree,
+      })),
+      chests: state.chests.map(chest => ({
+        id: chest.id,
+        items: chest.items
+      })),
+      player: {
+        x: state.player.x,
+        y: state.player.y,
+        facing: state.player.facing,
+      },
+      log: state.log,
+      version: "1.0",
+      timestamp: Date.now(),
+    };
+    
+    localStorage.setItem(`stardewClone_save_${saveSlot}`, JSON.stringify(saveData));
+    state.currentSaveSlot = saveSlot;
+    addLog(`Jogo guardado no slot ${saveSlot} com sucesso!`);
+    return true;
+  } catch (error) {
+    console.error("Erro ao guardar:", error);
+    addLog("Erro ao guardar o jogo!");
+    return false;
+  }
+}
+
+function loadGame(slot = null) {
+  const saveSlot = slot || state.currentSaveSlot;
+  try {
+    const saveDataStr = localStorage.getItem(`stardewClone_save_${saveSlot}`);
+    if (!saveDataStr) {
+      console.log(`Nenhum save encontrado no slot ${saveSlot}!`);
+      return false;
+    }
+    
+    const saveData = JSON.parse(saveDataStr);
+    
+    // Restore state
+    state.day = saveData.day || state.day;
+    state.money = saveData.money || state.money;
+    state.hoeLevel = saveData.hoeLevel || state.hoeLevel;
+    state.harvestLevel = saveData.harvestLevel || state.harvestLevel;
+    state.fertilizerToolLevel = saveData.fertilizerToolLevel || state.fertilizerToolLevel;
+    state.inventory = saveData.inventory || state.inventory;
+    state.hotbarSelection = saveData.hotbarSelection || state.hotbarSelection;
+    
+    // Restore farmland
+    if (saveData.farmland && saveData.farmland.length > 0) {
+      state.farmland = saveData.farmland.map(tileData => {
+        const tile = {
+          row: tileData.row,
+          col: tileData.col,
+          tilled: tileData.tilled || false,
+          watered: tileData.watered || false,
+          crop: tileData.crop || null,
+          sprinkler: tileData.sprinkler || 0,
+          fertilizer: tileData.fertilizer || null,
+          chest: null,
+          tree: tileData.tree || false,
+        };
+        
+        if (tileData.chest) {
+          tile.chest = {
+            id: tileData.chest.id,
+            items: tileData.chest.items || Array(16).fill(null),
+          };
+        }
+        
+        return tile;
+      });
+    } else {
+      // Initialize empty farmland if no save data
+      state.farmland = [];
+      for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+          const hasTree = Math.random() < 0.12 && 
+                          row > 3 && row < GRID_SIZE - 4 && 
+                          col > 3 && col < GRID_SIZE - 4 &&
+                          !(row >= 4 && row <= 6 && col >= 4 && col <= 6);
+          
+          state.farmland.push({
+            row,
+            col,
+            tilled: false,
+            watered: false,
+            crop: null,
+            sprinkler: 0,
+            fertilizer: null,
+            chest: null,
+            tree: hasTree,
+          });
+        }
+      }
+    }
+    
+    // Restore chests
+    if (saveData.chests) {
+      state.chests = saveData.chests.map(chestData => ({
+        id: chestData.id,
+        items: chestData.items || Array(16).fill(null),
+      }));
+      
+      // Link chests to tiles
+      state.farmland.forEach(tile => {
+        if (tile.chest && tile.chest.id) {
+          const chest = state.chests.find(c => c.id === tile.chest.id);
+          if (chest) {
+            tile.chest = chest;
+          }
+        }
+      });
+    }
+    
+    // Restore player position
+    if (saveData.player) {
+      state.player.x = saveData.player.x || state.player.x;
+      state.player.y = saveData.player.y || state.player.y;
+      state.player.facing = saveData.player.facing || state.player.facing;
+    }
+    
+    // Restore log
+    if (saveData.log) {
+      state.log = saveData.log;
+    }
+    
+    state.currentSaveSlot = saveSlot;
+    
+    // Update camera
+    state.camera.x = state.player.x - canvas.width / 2 + PLAYER_SIZE / 2;
+    state.camera.y = state.player.y - canvas.height / 2 + PLAYER_SIZE / 2;
+    const maxCameraX = Math.max(0, GRID_SIZE * TILE_SIZE - canvas.width);
+    const maxCameraY = Math.max(0, GRID_SIZE * TILE_SIZE - canvas.height);
+    state.camera.x = Math.max(0, Math.min(maxCameraX, state.camera.x));
+    state.camera.y = Math.max(0, Math.min(maxCameraY, state.camera.y));
+    
+    // Refresh UI
+    renderStats();
+    renderHotbar();
+    renderLog();
+    renderInventory();
+    
+    addLog(`Jogo carregado do slot ${saveSlot} com sucesso!`);
+    return true;
+  } catch (error) {
+    console.error("Erro ao carregar:", error);
+    addLog("Erro ao carregar o jogo!");
+    return false;
+  }
+}
+
+// Save Slots Management
+function getSaveSlotInfo(slot) {
+  const saveDataStr = localStorage.getItem(`stardewClone_save_${slot}`);
+  if (!saveDataStr) {
+    return null;
+  }
+  try {
+    const saveData = JSON.parse(saveDataStr);
+    return {
+      slot,
+      day: saveData.day || 1,
+      money: saveData.money || 0,
+      timestamp: saveData.timestamp || 0,
+      exists: true,
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+function openSaveSlotsModal(mode = "save") {
+  state.openModal = "save_slots";
+  state.saveSlotsMode = mode;
+  document.getElementById("save-slots-modal").style.display = "flex";
+  renderSaveSlots();
+}
+
+function closeSaveSlotsModal() {
+  state.openModal = null;
+  state.saveSlotsMode = null;
+  document.getElementById("save-slots-modal").style.display = "none";
+}
+
+function renderSaveSlots() {
+  const container = document.getElementById("save-slots-container");
+  const title = document.getElementById("save-slots-title");
+  const mode = state.saveSlotsMode || "save";
+  
+  title.textContent = mode === "save" ? "Selecionar Slot para Guardar" : "Selecionar Slot para Carregar";
+  
+  container.innerHTML = "";
+  
+  for (let slot = 1; slot <= 3; slot++) {
+    const slotInfo = getSaveSlotInfo(slot);
+    const slotDiv = document.createElement("div");
+    slotDiv.className = "save-slot-card";
+    slotDiv.style.cssText = `
+      padding: 15px;
+      margin: 10px;
+      border: 2px solid ${slot === state.currentSaveSlot ? "#4a90e2" : "#666"};
+      border-radius: 8px;
+      background: ${slotInfo ? "#2a2a2a" : "#1a1a1a"};
+      cursor: pointer;
+      min-width: 200px;
+    `;
+    
+    if (slotInfo) {
+      const date = new Date(slotInfo.timestamp);
+      slotDiv.innerHTML = `
+        <h3>Slot ${slot} ${slot === state.currentSaveSlot ? "(Atual)" : ""}</h3>
+        <p>Dia: ${slotInfo.day}</p>
+        <p>Dinheiro: ${formatNumber(slotInfo.money)}</p>
+        <p style="font-size: 12px; color: #aaa;">${date.toLocaleString("pt-PT")}</p>
+      `;
+    } else {
+      slotDiv.innerHTML = `
+        <h3>Slot ${slot}</h3>
+        <p style="color: #888;">Vazio</p>
+      `;
+    }
+    
+    slotDiv.onclick = () => {
+      if (mode === "save") {
+        if (confirm(`Guardar no slot ${slot}? ${slotInfo ? "Isto irá sobrescrever o save existente." : ""}`)) {
+          saveGame(slot);
+          closeSaveSlotsModal();
+        }
+      } else {
+        if (slotInfo) {
+          if (confirm(`Carregar do slot ${slot}? O progresso atual será perdido!`)) {
+            loadGame(slot);
+            closeSaveSlotsModal();
+          }
+        } else {
+          addLog("Este slot está vazio!");
+        }
+      }
+    };
+    
+    container.appendChild(slotDiv);
+  }
+}
+
+// Auto-save every 30 seconds
+let autoSaveInterval = null;
+function startAutoSave() {
+  if (autoSaveInterval) clearInterval(autoSaveInterval);
+  autoSaveInterval = setInterval(() => {
+    saveGame(); // Uses currentSaveSlot
+  }, 30000); // 30 seconds
+}
+
 // Initialize
 function bootstrap() {
   if (!canvas) {
@@ -1385,7 +2719,60 @@ function bootstrap() {
     return;
   }
   
-  initFarm();
+  // Check if there's a save file in slot 1 (default) or old save format
+  const hasSaveSlot1 = localStorage.getItem('stardewClone_save_1') !== null;
+  const hasOldSave = localStorage.getItem('stardewClone_save') !== null;
+  
+  // Migrate old save to slot 1 if exists
+  if (hasOldSave && !hasSaveSlot1) {
+    try {
+      const oldSave = localStorage.getItem('stardewClone_save');
+      localStorage.setItem('stardewClone_save_1', oldSave);
+      localStorage.removeItem('stardewClone_save');
+      console.log("Save antigo migrado para o slot 1!");
+    } catch (error) {
+      console.error("Erro ao migrar save antigo:", error);
+    }
+  }
+  
+  // Determine if we should load a save
+  const finalHasSave = localStorage.getItem('stardewClone_save_1') !== null;
+  
+  if (!finalHasSave) {
+    // No save exists, initialize new game
+    console.log("Inicializando novo jogo...");
+    initFarm();
+  } else {
+    // Try to load save
+    console.log("A carregar save do slot 1...");
+    const loaded = loadGame(1);
+    if (!loaded) {
+      console.log("Falha ao carregar save, inicializando novo jogo...");
+      initFarm();
+    } else {
+      console.log("Save carregado com sucesso! Farmland tem", state.farmland.length, "tiles");
+      // Check if inventory is empty or missing initial items
+      const hasInitialItems = state.inventory.some(item => 
+        item && (item.type === "hoe" || item.type === "water" || item.type === "harvest" || item.type === "fertilizer_tool" || item.type === "axe")
+      );
+      if (!hasInitialItems) {
+        console.log("Inventário vazio ou sem itens iniciais, adicionando itens iniciais...");
+        // Add initial items if inventory is empty
+        addItemToInventory({ type: "hoe", level: 1, emoji: "🔨", name: "Enxada Básica" });
+        addItemToInventory({ type: "water", emoji: "💧", name: "Regador" });
+        addItemToInventory({ type: "harvest", level: 1, emoji: "⚔️", name: "Foice Básica" });
+        addItemToInventory({ type: "fertilizer_tool", level: 1, emoji: "🌿", name: "Aplicador de Fertilizante Básico" });
+        addItemToInventory({ type: "axe", emoji: "🪓", name: "Machado" });
+        addItemToInventory({ type: "seed", crop: "trigo", emoji: "🌾", name: "Semente de Trigo" }, 3);
+      }
+    }
+  }
+  
+  // Ensure farmland is initialized
+  if (state.farmland.length === 0) {
+    console.error("Farmland está vazio após inicialização! Inicializando...");
+    initFarm();
+  }
   
   // Ensure canvas is sized
   resizeCanvas();
@@ -1403,6 +2790,9 @@ function bootstrap() {
   renderStats();
   renderHotbar();
   renderLog();
+  
+  // Start auto-save
+  startAutoSave();
   
   // Initial render
   render();
