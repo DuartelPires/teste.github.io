@@ -736,7 +736,7 @@ function getTileInFront() {
 }
 
 // Check if player is within range of a target tile
-// For area tools, checks if player is within the tool's area of effect
+// For area tools, checks if player is within the tool's area of effect centered on the target tile
 function isWithinRange(tile, toolLevel = 1) {
   if (!tile) return false;
   
@@ -750,23 +750,16 @@ function isWithinRange(tile, toolLevel = 1) {
     return distanceX <= 1 && distanceY <= 1;
   }
   
-  // For area tools, check if the tile is within the tool's area
-  // and if the player is also within that area
+  // For area tools, check if the player is within the tool's area
+  // centered on the target tile (not the tile in front of player)
   const radius = toolLevel - 1;
-  const frontTile = getTileInFront();
-  if (!frontTile) return false;
+  const { row: centerRow, col: centerCol } = tile;
   
-  const { row: centerRow, col: centerCol } = frontTile;
-  
-  // Check if target tile is within the tool's area
-  const tileInArea = Math.abs(tile.row - centerRow) <= radius && 
-                     Math.abs(tile.col - centerCol) <= radius;
-  
-  // Check if player is within the tool's area
+  // Check if player is within the tool's area centered on the target tile
   const playerInArea = Math.abs(playerTileY - centerRow) <= radius && 
                        Math.abs(playerTileX - centerCol) <= radius;
   
-  return tileInArea && playerInArea;
+  return playerInArea;
 }
 
 // Player Movement
@@ -878,6 +871,18 @@ function interact() {
   const tile = getTileInFront();
   if (!tile) return;
 
+  // Check for chest interaction (no item needed)
+  if (tile.chest) {
+    openChest(tile.chest);
+    return;
+  }
+
+  const item = getSelectedItem();
+  if (!item) {
+    addLog("Nenhum item selecionado!");
+    return;
+  }
+
   // Get tool level for range check
   let toolLevel = 1;
   if (item.type === "hoe") {
@@ -888,21 +893,10 @@ function interact() {
     toolLevel = item.level || state.fertilizerToolLevel || 1;
   }
 
-  // Check if player is within range
-  if (!isWithinRange(tile, toolLevel)) {
+  // Check if player is within range (for area tools, use toolLevel; for single-tile actions, use 1)
+  const rangeLevel = (item.type === "hoe" || item.type === "harvest" || item.type === "scythe" || item.type === "fertilizer_tool") ? toolLevel : 1;
+  if (!isWithinRange(tile, rangeLevel)) {
     addLog("Muito longe! Aproxime-se mais.");
-    return;
-  }
-
-  // Check for chest interaction
-  if (tile.chest) {
-    openChest(tile.chest);
-    return;
-  }
-
-  const item = getSelectedItem();
-  if (!item) {
-    addLog("Nenhum item selecionado!");
     return;
   }
 
@@ -953,6 +947,15 @@ canvas.addEventListener("click", (e) => {
   const tile = getTileAtWorld(mouseX, mouseY);
   if (!tile) return;
 
+  // Check for chest interaction (no item needed)
+  if (tile.chest) {
+    openChest(tile.chest);
+    return;
+  }
+
+  const item = getSelectedItem();
+  if (!item) return;
+
   // Get tool level for range check
   let toolLevel = 1;
   if (item.type === "hoe") {
@@ -963,20 +966,12 @@ canvas.addEventListener("click", (e) => {
     toolLevel = item.level || state.fertilizerToolLevel || 1;
   }
 
-  // Check if player is within range
-  if (!isWithinRange(tile, toolLevel)) {
+  // Check if player is within range (for area tools, use toolLevel; for single-tile actions, use 1)
+  const rangeLevel = (item.type === "hoe" || item.type === "harvest" || item.type === "scythe" || item.type === "fertilizer_tool") ? toolLevel : 1;
+  if (!isWithinRange(tile, rangeLevel)) {
     addLog("Muito longe! Aproxime-se mais.");
     return;
   }
-
-  // Check for chest interaction
-  if (tile.chest) {
-    openChest(tile.chest);
-    return;
-  }
-
-  const item = getSelectedItem();
-  if (!item) return;
 
   if (item.type === "hoe") {
     tillArea(tile, item.level || state.hoeLevel || 1);
@@ -2269,7 +2264,68 @@ document.getElementById("close-chest").onclick = closeChest;
 document.getElementById("close-fertilizer").onclick = closeFertilizerSelect;
 document.getElementById("close-save-slots").onclick = closeSaveSlotsModal;
 
+// New Game function
+function startNewGame() {
+  if (confirm("Tem certeza que deseja começar um novo jogo? Todo o progresso será perdido!")) {
+    // Clear all save slots
+    for (let slot = 1; slot <= 3; slot++) {
+      localStorage.removeItem(`stardewClone_save_${slot}`);
+    }
+    // Also clear old save format if exists
+    localStorage.removeItem('stardewClone_save');
+    
+    // Reset state to initial values
+    state.day = 1;
+    state.money = 350;
+    state.hoeLevel = 1;
+    state.harvestLevel = 1;
+    state.fertilizerToolLevel = 1;
+    state.inventory = Array(INVENTORY_SIZE).fill(null);
+    state.hotbarSelection = 0;
+    state.farmland = [];
+    state.chests = [];
+    state.log = ["Bem-vindo! Use WASD para mover, E para inventário e Espaço para interagir."];
+    state.player = {
+      x: TILE_SIZE * 5,
+      y: TILE_SIZE * 5,
+      facing: "down",
+    };
+    state.currentSaveSlot = 1;
+    state.mouseWorldX = -1;
+    state.mouseWorldY = -1;
+    
+    // Close any open modals
+    if (state.openModal) {
+      if (state.openModal === "inventory") closeInventory();
+      else if (state.openModal === "shop") closeShop();
+      else if (state.openModal === "chest") closeChest();
+      else if (state.openModal === "fertilizer_select") closeFertilizerSelect();
+      else if (state.openModal === "save_slots") closeSaveSlotsModal();
+    }
+    
+    // Initialize farm
+    initFarm();
+    
+    // Reset camera
+    state.camera.x = state.player.x - canvas.width / 2 + PLAYER_SIZE / 2;
+    state.camera.y = state.player.y - canvas.height / 2 + PLAYER_SIZE / 2;
+    const maxCameraX = Math.max(0, GRID_SIZE * TILE_SIZE - canvas.width);
+    const maxCameraY = Math.max(0, GRID_SIZE * TILE_SIZE - canvas.height);
+    state.camera.x = Math.max(0, Math.min(maxCameraX, state.camera.x));
+    state.camera.y = Math.max(0, Math.min(maxCameraY, state.camera.y));
+    
+    // Refresh UI
+    renderStats();
+    renderHotbar();
+    renderLog();
+    renderInventory();
+    
+    addLog("Novo jogo iniciado!");
+  }
+}
+
 // Save/Load button handlers
+document.getElementById("new-game-btn").onclick = startNewGame;
 document.getElementById("save-btn").onclick = () => openSaveSlotsModal("save");
 document.getElementById("load-btn").onclick = () => openSaveSlotsModal("load");
 
