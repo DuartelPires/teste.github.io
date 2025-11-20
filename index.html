@@ -15,6 +15,8 @@
             <span id="stat-day">Dia 1</span>
             <span id="stat-money">Dinheiro: 350g</span>
             <span id="stat-hoe">Enxada: Básica</span>
+            <button id="save-btn" style="padding: 4px 8px; margin-left: 8px; cursor: pointer;">💾 Guardar</button>
+            <button id="load-btn" style="padding: 4px 8px; margin-left: 4px; cursor: pointer;">📂 Carregar</button>
           </div>
         </header>
 
@@ -54,6 +56,24 @@
           </div>
         </div>
 
+        <!-- Fertilizer Select Modal -->
+        <div class="shop-modal" id="fertilizer-modal" style="display: none;">
+          <div class="modal-content">
+            <h2>Selecionar Fertilizante</h2>
+            <div id="fertilizer-items" class="shop-items"></div>
+            <button class="close-btn" id="close-fertilizer">Cancelar (E)</button>
+          </div>
+        </div>
+
+        <!-- Save Slots Modal -->
+        <div class="shop-modal" id="save-slots-modal" style="display: none;">
+          <div class="modal-content">
+            <h2 id="save-slots-title">Selecionar Slot de Save</h2>
+            <div id="save-slots-container" class="shop-items" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+            <button class="close-btn" id="close-save-slots">Cancelar (E)</button>
+          </div>
+        </div>
+
         <!-- Log Panel -->
         <div class="panel log-panel">
           <h3>Registro</h3>
@@ -66,6 +86,12 @@
       </div>
 
       <canvas id="game-canvas" width="800" height="600"></canvas>
+      
+      <!-- Tooltip -->
+      <div id="item-tooltip" style="display: none; position: fixed; background: rgba(15, 23, 42, 0.95); border: 2px solid #4a90e2; border-radius: 8px; padding: 12px; z-index: 1000; pointer-events: none; max-width: 300px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);">
+        <div id="tooltip-name" style="font-weight: bold; font-size: 1.1rem; color: #fff; margin-bottom: 4px;"></div>
+        <div id="tooltip-desc" style="font-size: 0.9rem; color: #cbd5e1;"></div>
+      </div>
     </div>
     <script type="module" src="script.js"></script>
   </body>
