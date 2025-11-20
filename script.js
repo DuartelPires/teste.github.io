@@ -583,6 +583,7 @@ const state = {
   currentSaveSlot: 1, // Current save slot (1-3)
   mouseWorldX: -1, // Mouse position in world coordinates (-1 means not on canvas)
   mouseWorldY: -1, // Mouse position in world coordinates (-1 means not on canvas)
+  logPanelVisible: true, // Whether log panel is visible
 };
 
 // Canvas Setup
@@ -2135,6 +2136,7 @@ function addLog(message) {
 
 function renderLog() {
   const logEl = document.getElementById("log");
+  if (!logEl) return;
   logEl.innerHTML = "";
   state.log.forEach((entry) => {
     const div = document.createElement("div");
@@ -2142,6 +2144,15 @@ function renderLog() {
     div.textContent = entry;
     logEl.appendChild(div);
   });
+}
+
+function toggleLogPanel() {
+  state.logPanelVisible = !state.logPanelVisible;
+  const logPanel = document.querySelector(".log-panel");
+  if (logPanel) {
+    logPanel.style.display = state.logPanelVisible ? "block" : "none";
+  }
+  // Don't add log message when toggling to avoid infinite loop
 }
 
 // Day Progression
@@ -2245,6 +2256,11 @@ document.addEventListener("keydown", (e) => {
   if (key === "q") {
     e.preventDefault();
     progressDay();
+    return;
+  }
+  if (key === "l" || key === "L") {
+    e.preventDefault();
+    toggleLogPanel();
     return;
   }
 });
