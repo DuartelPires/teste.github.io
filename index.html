@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stardew Clone</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="ui-overlay">
+        <header>
+          <h1>Stardew Clone</h1>
+          <div class="stats">
+            <span id="stat-day">Dia 1</span>
+            <span id="stat-money">Dinheiro: 350g</span>
+            <span id="stat-hoe">Enxada: Básica</span>
+          </div>
+        </header>
+
+        <!-- Hotbar -->
+        <div class="hotbar" id="hotbar"></div>
+
+        <!-- Inventory Modal -->
+        <div class="inventory-modal" id="inventory-modal" style="display: none;">
+          <div class="modal-content">
+            <h2>Inventário</h2>
+            <div class="inventory-grid" id="inventory-grid"></div>
+            <button class="close-btn" id="close-inventory">Fechar (E)</button>
+          </div>
+        </div>
+
+        <!-- Shop Modal -->
+        <div class="shop-modal" id="shop-modal" style="display: none;">
+          <div class="modal-content">
+            <h2>Loja</h2>
+            <div id="shop-items" class="shop-items"></div>
+            <button class="close-btn" id="close-shop">Fechar (E)</button>
+          </div>
+        </div>
+
+        <!-- Chest Modal -->
+        <div class="chest-modal" id="chest-modal" style="display: none;">
+          <div class="modal-content">
+            <div class="chest-section">
+              <h2>Chest</h2>
+              <div class="chest-grid" id="chest-grid"></div>
+            </div>
+            <div class="inventory-section">
+              <h2>Inventário</h2>
+              <div class="inventory-grid" id="chest-inventory-grid"></div>
+            </div>
+            <button class="close-btn" id="close-chest">Fechar (E)</button>
+          </div>
+        </div>
+
+        <!-- Log Panel -->
+        <div class="panel log-panel">
+          <h3>Registro</h3>
+          <div id="log" class="log"></div>
+        </div>
+
+        <div class="controls-hint">
+          <p>WASD: Mover | Espaço: Interagir | E: Inventário | Q: Terminar Dia | 1-9: Hotbar | Clique: Usar item</p>
+        </div>
+      </div>
+
+      <canvas id="game-canvas" width="800" height="600"></canvas>
+    </div>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
