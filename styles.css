@@ -295,6 +295,39 @@ header h1 {
   transform: translateY(-2px);
 }
 
+.shop-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+  padding-bottom: 8px;
+}
+
+.shop-tab {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.shop-tab:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: #fff;
+}
+
+.shop-tab.active {
+  background: rgba(34, 211, 238, 0.2);
+  color: #22d3ee;
+  border-bottom-color: #22d3ee;
+}
+
 .shop-items {
   display: flex;
   flex-direction: column;
@@ -328,6 +361,53 @@ header h1 {
   display: block;
   color: rgba(248, 250, 252, 0.7);
   font-size: 0.85rem;
+}
+
+.shop-quantity-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shop-quantity-label {
+  font-size: 0.85rem;
+  color: rgba(248, 250, 252, 0.8);
+  white-space: nowrap;
+}
+
+.shop-quantity-input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #f5f5f5;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: text;
+  pointer-events: auto;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.shop-quantity-input::-webkit-outer-spin-button,
+.shop-quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.shop-quantity-input:focus {
+  outline: none;
+  border-color: #22d3ee;
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.shop-quantity-input::-webkit-inner-spin-button,
+.shop-quantity-input::-webkit-outer-spin-button {
+  opacity: 1;
+  cursor: pointer;
 }
 
 .shop-card button {
