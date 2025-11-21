@@ -1449,7 +1449,23 @@ canvas.addEventListener("click", (e) => {
   const tile = getTileAtWorld(mouseX, mouseY);
   if (!tile) return;
 
+  const item = getSelectedItem();
+  
+  // If removal tool is selected, prioritize removal over other interactions
+  if (item && item.type === "removal_tool") {
+    // Check if player is within range (removal tool doesn't need level, but check basic range)
+    if (!isWithinRange(tile, 1)) {
+      addLog("Muito longe! Aproxime-se mais.");
+      return;
+    }
+    removeItem(tile);
+    renderInventory();
+    renderStats();
+    return;
+  }
+
   // Check for auto planter interaction (click on auto planter to configure)
+  // Only if removal tool is NOT selected
   if (tile.autoPlanter > 0) {
     openPlanterMenu(tile);
     return;
@@ -1461,7 +1477,6 @@ canvas.addEventListener("click", (e) => {
     return;
   }
 
-  const item = getSelectedItem();
   if (!item) return;
 
   // Get tool level for range check
@@ -1500,8 +1515,6 @@ canvas.addEventListener("click", (e) => {
     chopTree(tile);
   } else if (item.type === "fertilizer_tool") {
     openFertilizerSelect(tile, item.level || state.fertilizerToolLevel || 1);
-  } else if (item.type === "removal_tool") {
-    removeItem(tile);
   }
   
   renderInventory();
