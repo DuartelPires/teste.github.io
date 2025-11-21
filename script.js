@@ -3396,7 +3396,7 @@ function startNewGame() {
 
     // Reset state to initial values
     state.day = 1;
-    state.money = 10000000100000001000000010000000;
+    state.money = 350;
     state.hoeLevel = 1;
     state.harvestLevel = 1;
     state.fertilizerToolLevel = 1;
