@@ -466,6 +466,7 @@ header h1 {
 
 .controls-hint {
   position: absolute;
+  text-align: center;
   bottom: 80px;
   left: 50%;
   transform: translateX(-50%);

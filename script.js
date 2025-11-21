@@ -951,6 +951,7 @@ const state = {
   currentSaveSlot: 1, // Current save slot (1-3)
   mouseWorldX: -1, // Mouse position in world coordinates (-1 means not on canvas)
   mouseWorldY: -1, // Mouse position in world coordinates (-1 means not on canvas)
+  logVisible: true, // Whether the log panel is visible
 };
 
 // Canvas Setup
@@ -2673,50 +2674,61 @@ function renderPlanterMenu() {
     `;
     
     const btn = document.createElement("button");
-    btn.textContent = isSelected ? "Desconfigurar" : "Configurar e Plantar";
-    btn.disabled = (state.money < totalCost && !isSelected) || plantableTiles === 0;
+    const hasExistingConfig = currentPlanterTile.planterSeedType !== null;
+    btn.textContent = isSelected ? "Desconfigurar" : (hasExistingConfig ? "Trocar Configuração" : "Configurar e Plantar");
+    // Permitir desconfigurar ou trocar sempre, mesmo sem tiles vazias
+    // Só exigir tiles vazias e dinheiro na primeira configuração
+    btn.disabled = !isSelected && !hasExistingConfig && (plantableTiles === 0 || state.money < totalCost);
     btn.onclick = () => {
       if (isSelected) {
         currentPlanterTile.planterSeedType = null;
         addLog("Auto Planter desconfigurado.");
         closePlanterMenu();
       } else {
-        // Só configura se tiver dinheiro suficiente para plantar tudo
-        if (state.money >= totalCost && plantableTiles > 0) {
-          // Plantar tudo de uma vez
-          let planted = 0;
-          let totalSpent = 0;
-          const { row, col } = currentPlanterTile;
-          for (let r = row - radius; r <= row + radius; r++) {
-            for (let c = col - radius; c <= col + radius; c++) {
-              const t = getTileAt(r, c);
-              if (t && t !== currentPlanterTile && !t.crop && !t.sprinkler && 
-                  !t.autoHarvester && !t.autoPlanter && !t.chest && !t.tree && 
-                  t.tileType !== "lake" && t.tileType !== "shop_zone") {
-                // Prepare soil if needed
-                if (!t.tilled) {
-                  t.tilled = true;
-                }
-                // Plant
-                state.money -= cropData.seedCost;
-                totalSpent += cropData.seedCost;
-                t.crop = {
-                  type: cropKey,
-                  timeElapsed: 0,
-                  stage: 0,
-                  ready: false,
-                };
-                t.watered = false;
-                planted++;
-              }
-            }
-          }
+        // Se já existe uma configuração, apenas trocar sem replantar tudo
+        if (hasExistingConfig) {
           currentPlanterTile.planterSeedType = cropKey;
-          addLog(`${cropData.nome} configurado! Plantou ${planted} tiles por ${formatNumber(totalSpent)} gold. Replantará automaticamente quando colhido.`);
+          addLog(`${cropData.nome} configurado! O Auto Planter replantará ${cropData.nome} automaticamente quando as plantas forem colhidas.`);
           renderStats();
           closePlanterMenu();
         } else {
-          addLog("Dinheiro insuficiente para plantar tudo! Não foi configurado.");
+          // Se não há configuração, plantar tudo de uma vez (comportamento original)
+          if (state.money >= totalCost && plantableTiles > 0) {
+            // Plantar tudo de uma vez
+            let planted = 0;
+            let totalSpent = 0;
+            const { row, col } = currentPlanterTile;
+            for (let r = row - radius; r <= row + radius; r++) {
+              for (let c = col - radius; c <= col + radius; c++) {
+                const t = getTileAt(r, c);
+                if (t && t !== currentPlanterTile && !t.crop && !t.sprinkler && 
+                    !t.autoHarvester && !t.autoPlanter && !t.chest && !t.tree && 
+                    t.tileType !== "lake" && t.tileType !== "shop_zone") {
+                  // Prepare soil if needed
+                  if (!t.tilled) {
+                    t.tilled = true;
+                  }
+                  // Plant
+                  state.money -= cropData.seedCost;
+                  totalSpent += cropData.seedCost;
+                  t.crop = {
+                    type: cropKey,
+                    timeElapsed: 0,
+                    stage: 0,
+                    ready: false,
+                  };
+                  t.watered = false;
+                  planted++;
+                }
+              }
+            }
+            currentPlanterTile.planterSeedType = cropKey;
+            addLog(`${cropData.nome} configurado! Plantou ${planted} tiles por ${formatNumber(totalSpent)} gold. Replantará automaticamente quando colhido.`);
+            renderStats();
+            closePlanterMenu();
+          } else {
+            addLog("Dinheiro insuficiente para plantar tudo! Não foi configurado.");
+          }
         }
       }
     };
@@ -3242,6 +3254,14 @@ function renderLog() {
   });
 }
 
+function toggleLog() {
+  state.logVisible = !state.logVisible;
+  const logPanel = document.querySelector(".log-panel");
+  if (logPanel) {
+    logPanel.style.display = state.logVisible ? "block" : "none";
+  }
+}
+
 // Day Progression
 function applySprinklers() {
   state.farmland.forEach((tile) => {
@@ -3363,6 +3383,11 @@ document.addEventListener("keydown", (e) => {
   if (key === "q") {
     e.preventDefault();
     progressDay();
+    return;
+  }
+  if (key === "l") {
+    e.preventDefault();
+    toggleLog();
     return;
   }
 });
