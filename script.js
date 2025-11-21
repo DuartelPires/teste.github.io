@@ -33,7 +33,7 @@ const crops = {
     nome: "Uva",
     emoji: "🍇",
     seedCost: 10000,
-    sellPrice: 10500,
+    sellPrice: 1100,
     growSeconds: 120, // 120 segundos total, 3 etapas = 40s cada
     description: "Demora mas vale ouro. Cresce em 120 segundos (3 etapas).",
     color: "#9370db",
@@ -43,7 +43,7 @@ const crops = {
     nome: "Morango",
     emoji: "🍓",
     seedCost: 50000,
-    sellPrice: 52000,
+    sellPrice: 53500,
     growSeconds: 170, // 170 segundos total, 3 etapas = ~57s cada
     description: "Doce e valioso. Cresce em 170 segundos (3 etapas).",
     color: "#ff1744",
@@ -53,7 +53,7 @@ const crops = {
     nome: "Abacaxi",
     emoji: "🍍",
     seedCost: 350000,
-    sellPrice: 475000,
+    sellPrice: 385000,
     growSeconds: 200, // 200 segundos total, 3 etapas = ~67s cada
     description: "Exótico e lucrativo. Cresce em 200 segundos (3 etapas).",
     color: "#ffd700",
@@ -63,7 +63,7 @@ const crops = {
     nome: "Melancia",
     emoji: "🍉",
     seedCost: 2000000,
-    sellPrice: 2100000,
+    sellPrice: 2150000,
     growSeconds: 290, // 290 segundos total, 3 etapas = ~97s cada
     description: "Grande e refrescante. Cresce em 290 segundos (3 etapas).",
     color: "#c41e3a",
