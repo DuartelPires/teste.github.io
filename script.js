@@ -33,7 +33,7 @@ const crops = {
     nome: "Uva",
     emoji: "🍇",
     seedCost: 10000,
-    sellPrice: 1100,
+    sellPrice: 11000,
     growSeconds: 120, // 120 segundos total, 3 etapas = 40s cada
     description: "Demora mas vale ouro. Cresce em 120 segundos (3 etapas).",
     color: "#9370db",
